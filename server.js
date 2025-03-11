@@ -41,6 +41,10 @@ app.use(
   })
 );
 
+if (env.node_env === "production") {
+  app.set("trust proxy", 1);
+}
+
 // Handle cookies 🍪
 app.use(cookieParser());
 
@@ -57,6 +61,7 @@ app.use(
     }),
     cookie: { 
       secure: env.node_env === "production", // Set to true if using HTTPS
+      sameSite: env.node_env === "production" ? "none" : "lax",
       httpOnly: true, // Prevent client-side JavaScript from accessing the cookie
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
