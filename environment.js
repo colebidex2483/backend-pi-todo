@@ -8,6 +8,7 @@ const env = {
   platform_api_url: process.env.PLATFORM_API_URL || '',
   mongo_db: process.env.MONGO_URI,
   frontend_url: process.env.FRONTEND_URL,
+  node_env: process.env.NODE_ENV || 'development',
 };
 
 export default env;

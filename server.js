@@ -56,13 +56,12 @@ app.use(
       collectionName: "user_sessions",
     }),
     cookie: { 
-      secure: false, // Set to true if using HTTPS
+      secure: env.node_env === "production", // Set to true if using HTTPS
       httpOnly: true, // Prevent client-side JavaScript from accessing the cookie
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
   })
 );
-
 app.use(express.json());
 // Routes
 app.use("/api/users", userRoutes);
