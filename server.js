@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import express from "express";
+import helmet from "helmet";
 import connectDB from "./config/db.js";
 import cors from "cors";
 import logger from "morgan";
@@ -12,6 +13,7 @@ import taskRoutes from "./routes/taskRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js"
 import dotenv from "dotenv";
+import rateLimit from "express-rate-limit";
 import env from "./environment.js";
 
 // Load environment variables
@@ -19,10 +21,18 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // Connect to the database
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 20, // Block IP after 20 requests
+  message: "Too many requests from this IP, please try again later.",
+});
+
+
 connectDB();
 
 const app = express();
-
+app.use(helmet());
+app.use(limiter);
 // Handle CORS:
 app.use(cors({
   origin: env.frontend_url,
@@ -41,9 +51,9 @@ app.use(
   })
 );
 
-if (env.node_env === "production") {
-  app.set("trust proxy", 1);
-}
+// if (env.node_env === "production") {
+//   app.set("trust proxy", 1);
+// }
 
 // Handle cookies 🍪
 app.use(cookieParser());
@@ -88,7 +98,7 @@ app.use((err, req, res, next) => {
 });
 
 app.use((req, res) => {
-  res.status(404).json({ message: "Route not found" });
+  res.status(404).send("Not found");
 });
 
 const PORT = process.env.PORT || 5000;
